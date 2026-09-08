@@ -51,12 +51,16 @@ export const LabelTooltip = ({
     const show = () => setShowTooltip(true);
     const hide = () => setShowTooltip(false);
 
-    current.addEventListener('mouseenter', show);
-    current.addEventListener('mouseleave', hide);
+    current.addEventListener('pointerenter', show);
+    current.addEventListener('pointerleave', hide);
+    current.addEventListener('focus', show);
+    current.addEventListener('blur', hide);
 
     return () => {
-      current.removeEventListener('mouseenter', show);
-      current.removeEventListener('mouseleave', hide);
+      current.removeEventListener('pointerenter', show);
+      current.removeEventListener('pointerleave', hide);
+      current.removeEventListener('focus', show);
+      current.removeEventListener('blur', hide);
     };
   }, [anchorRef]);
 
@@ -107,6 +111,7 @@ export const SecondaryMetric: React.FC<SecondaryMetricInternalProps> = ({
     <span
       ref={anchorRef}
       className="echSecondaryMetric"
+      {...(label && labelPosition === 'tooltip' ? { role: 'button', tabIndex: 0 } : {})}
       {...(style ? { style } : {})}
       {...(ariaDescription ? { 'aria-describedby': ariaDescription } : {})}
     >

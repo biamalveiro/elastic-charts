@@ -49,10 +49,10 @@ describe('SecondaryMetric', () => {
     expect(container.querySelector('.echScreenReaderOnly')).toHaveTextContent(label);
     expect(container.querySelector('.echSecondaryMetric__value')).toHaveTextContent(value);
     expect(screen.queryByTestId('echTooltipHeader')).not.toBeInTheDocument();
-    fireEvent.mouseEnter(metric);
+    fireEvent.pointerEnter(metric);
     expect(screen.getByTestId('echTooltipHeader')).toHaveTextContent(label);
 
-    fireEvent.mouseLeave(metric);
+    fireEvent.pointerLeave(metric);
     expect(screen.queryByTestId('echTooltipHeader')).not.toBeInTheDocument();
   });
 });
