@@ -2908,7 +2908,7 @@ export interface SecondaryMetricProps {
     icon?: string;
     iconPosition?: 'before' | 'after';
     label?: string;
-    labelPosition?: 'before' | 'after';
+    labelPosition?: 'before' | 'after' | 'tooltip';
     style?: CSSProperties;
     value: string;
 }

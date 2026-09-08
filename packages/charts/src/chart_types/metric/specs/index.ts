@@ -33,8 +33,8 @@ export interface SecondaryMetricProps {
   badgeColor?: Color;
   /** Optional text color for the value badge. If not provided, it will be computed automatically for contrast */
   badgeTextColor?: Color;
-  /** Determines whether the label appears before or after the value */
-  labelPosition?: 'before' | 'after';
+  /** Determines whether the label appears before or after the value or is displayed in a tooltip */
+  labelPosition?: 'before' | 'after' | 'tooltip';
   /**  Optional CSS properties to apply to the container element */
   style?: CSSProperties;
   /** Optional aria description */
