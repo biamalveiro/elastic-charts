@@ -15,14 +15,31 @@ import type { Color } from '../../../../common/colors';
 import { Placement, TooltipPortal } from '../../../../components/portal';
 import { TooltipContainer, TooltipHeader } from '../../../../components/tooltip';
 import type { GlobalChartState } from '../../../../state/chart_state';
+import type { MetricStyle } from '../../../../utils/themes/theme';
 import type { SecondaryMetricProps } from '../../specs';
 
 type SecondaryMetricInternalProps = Omit<SecondaryMetricProps, 'badgeBorderColor'> & {
   badgeBorderColor: Color | undefined;
+  textAlign?: MetricStyle['extraTextAlign'];
 };
 
 /** @internal */
-export const LabelTooltip = ({ label, anchorRef }: { label: string; anchorRef: React.RefObject<HTMLSpanElement> }) => {
+export const getTooltipPlacement = (textAlign: MetricStyle['extraTextAlign'] = 'center'): Placement => {
+  if (textAlign === 'left') return Placement.Right;
+  if (textAlign === 'right') return Placement.Left;
+  return Placement.Top;
+};
+
+/** @internal */
+export const LabelTooltip = ({
+  label,
+  anchorRef,
+  placement,
+}: {
+  label: string;
+  anchorRef: React.RefObject<HTMLSpanElement>;
+  placement: Placement;
+}) => {
   const chartId = useSelector((state: GlobalChartState) => state.chartId);
   const zIndex = useSelector((state: GlobalChartState) => state.zIndex);
   const [showTooltip, setShowTooltip] = useState(false);
@@ -54,11 +71,7 @@ export const LabelTooltip = ({ label, anchorRef }: { label: string; anchorRef: R
       chartId={chartId}
       zIndex={zIndex + 100}
       visible
-      settings={{
-        placement: Placement.Top,
-        fallbackPlacements: [Placement.Bottom, Placement.Right, Placement.Left],
-        offset: 8,
-      }}
+      settings={{ placement }}
     >
       <div aria-hidden="true">
         <TooltipContainer>
@@ -81,6 +94,7 @@ export const SecondaryMetric: React.FC<SecondaryMetricInternalProps> = ({
   badgeBorderColor,
   icon,
   iconPosition,
+  textAlign,
 }) => {
   const anchorRef = useRef<HTMLSpanElement>(null);
   const hasVisibleLabel = Boolean(label) && labelPosition !== 'tooltip';
@@ -120,7 +134,9 @@ export const SecondaryMetric: React.FC<SecondaryMetricInternalProps> = ({
         </span>
       )}
       {labelPosition === 'after' && labelNode}
-      {label && labelPosition === 'tooltip' && <LabelTooltip label={label} anchorRef={anchorRef} />}
+      {label && labelPosition === 'tooltip' && (
+        <LabelTooltip label={label} anchorRef={anchorRef} placement={getTooltipPlacement(textAlign)} />
+      )}
     </span>
   );
 };
