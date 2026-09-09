@@ -7,7 +7,7 @@
  */
 
 import classNames from 'classnames';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 import { Badge } from './badge';
@@ -35,36 +35,17 @@ export const LabelTooltip = ({
   label,
   anchorRef,
   placement,
+  visible,
 }: {
   label: string;
   anchorRef: React.RefObject<HTMLSpanElement>;
   placement: Placement;
+  visible: boolean;
 }) => {
   const chartId = useSelector((state: GlobalChartState) => state.chartId);
   const zIndex = useSelector((state: GlobalChartState) => state.zIndex);
-  const [showTooltip, setShowTooltip] = useState(false);
 
-  useEffect(() => {
-    const { current } = anchorRef;
-    if (!current) return;
-
-    const show = () => setShowTooltip(true);
-    const hide = () => setShowTooltip(false);
-
-    current.addEventListener('pointerenter', show);
-    current.addEventListener('pointerleave', hide);
-    current.addEventListener('focus', show);
-    current.addEventListener('blur', hide);
-
-    return () => {
-      current.removeEventListener('pointerenter', show);
-      current.removeEventListener('pointerleave', hide);
-      current.removeEventListener('focus', show);
-      current.removeEventListener('blur', hide);
-    };
-  }, [anchorRef]);
-
-  if (!showTooltip) {
+  if (!visible) {
     return null;
   }
 
@@ -101,6 +82,11 @@ export const SecondaryMetric: React.FC<SecondaryMetricInternalProps> = ({
   textAlign,
 }) => {
   const anchorRef = useRef<HTMLSpanElement>(null);
+  const [showTooltip, setShowTooltip] = useState(false);
+
+  const handleTooltipEnter = useCallback(() => setShowTooltip(true), []);
+  const handleTooltipLeave = useCallback(() => setShowTooltip(false), []);
+
   const hasVisibleLabel = Boolean(label) && labelPosition !== 'tooltip';
 
   const labelNode = hasVisibleLabel ? (
@@ -111,7 +97,16 @@ export const SecondaryMetric: React.FC<SecondaryMetricInternalProps> = ({
     <span
       ref={anchorRef}
       className="echSecondaryMetric"
-      {...(label && labelPosition === 'tooltip' ? { role: 'button', tabIndex: 0 } : {})}
+      {...(label && labelPosition === 'tooltip'
+        ? {
+            role: 'button',
+            tabIndex: 0,
+            onPointerEnter: handleTooltipEnter,
+            onPointerLeave: handleTooltipLeave,
+            onFocus: handleTooltipEnter,
+            onBlur: handleTooltipLeave,
+          }
+        : {})}
       {...(style ? { style } : {})}
       {...(ariaDescription ? { 'aria-describedby': ariaDescription } : {})}
     >
@@ -140,7 +135,12 @@ export const SecondaryMetric: React.FC<SecondaryMetricInternalProps> = ({
       )}
       {labelPosition === 'after' && labelNode}
       {label && labelPosition === 'tooltip' && (
-        <LabelTooltip label={label} anchorRef={anchorRef} placement={getTooltipPlacement(textAlign)} />
+        <LabelTooltip
+          label={label}
+          anchorRef={anchorRef}
+          placement={getTooltipPlacement(textAlign)}
+          visible={showTooltip}
+        />
       )}
     </span>
   );
