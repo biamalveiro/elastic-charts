@@ -77,7 +77,7 @@ export const LabelTooltip = ({
       visible
       settings={{ placement }}
     >
-      <div aria-hidden="true">
+      <div aria-hidden="true" className="echSecondaryMetric__tooltip">
         <TooltipContainer>
           <TooltipHeader>{label}</TooltipHeader>
         </TooltipContainer>
